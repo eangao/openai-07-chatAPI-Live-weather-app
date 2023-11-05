@@ -4,10 +4,11 @@ import "./style/style.css";
 function Chat() {
   //Add states: inputValue, error, result, prompt, jresult
   const [inputValue, setInputValue] = useState("");
-  const [error, setError] = useState("");
   const [result, setResult] = useState("");
   const [prompt, setPrompt] = useState("");
   const [jresult, setJresult] = useState("");
+  const [responseOk, setResponseOk] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -30,6 +31,7 @@ function Chat() {
       });
 
       if (response.ok) {
+        setResponseOk(true);
         const data = await response.json();
 
         console.log(data);
@@ -40,6 +42,7 @@ function Chat() {
         setInputValue("");
         setError("");
       } else {
+        setResponseOk(false);
         throw new Error("An error occured");
       }
     } catch (error) {
@@ -75,7 +78,7 @@ function Chat() {
       {error && <div className="alert alert-danger mt-3">{error}</div>}
       {prompt && <div className="alert alert-secondary mt-3">{prompt}</div>}
       {result && <div className="alert alert-success mt-3">{result}</div>}
-      {result && (
+      {responseOk && (
         <pre className="alert alert-info mt-3">
           <code>{jresult}</code>
         </pre>

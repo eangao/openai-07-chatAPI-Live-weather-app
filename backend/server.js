@@ -23,9 +23,27 @@ const openai = new OpenAIApi(configuration);
 async function runCompletion(prompt) {
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
-    messages: [
-      { role: "system", content: "You are a doctor." },
-      { role: "user", content: prompt },
+    // model: "gpt-4",
+    messages: [{ role: "user", content: prompt }],
+    functions: [
+      {
+        name: "get_current_weather",
+        description: "Get the current weather in a given location",
+        parameters: {
+          type: "object",
+          properties: {
+            location: {
+              type: "string",
+              description: "The city and state, e.g. San Francisco, CA",
+            },
+            unit: {
+              type: "string",
+              enum: ["celsius", "fahrenheit"],
+            },
+          },
+          required: ["location"],
+        },
+      },
     ],
     temperature: 1,
     max_tokens: 50,
