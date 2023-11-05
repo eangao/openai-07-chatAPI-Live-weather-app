@@ -21,14 +21,15 @@ const openai = new OpenAIApi(configuration);
 //build the runCompletion which sends a request to the OPENAI Completion API
 //runCompletion
 async function runCompletion(prompt) {
-  const response = await openai.createCompletion({
-    model: "text-davinci-003",
-    prompt: prompt,
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      { role: "system", content: "You are a doctor." },
+      { role: "user", content: prompt },
+    ],
     temperature: 1,
     max_tokens: 50,
     top_p: 1,
-    // n: 3,
-    // echo: true,
     frequency_penalty: 0,
     presence_penalty: 0,
   });
@@ -64,12 +65,5 @@ app.post("/api/chatgpt", async (req, res) => {
 
 //set the PORT
 const PORT = process.env.PORT || 5000;
-
 //start the server on the chosen PORT
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
-
-const { encode, decode } = require("gpt-3-encoder");
-
-const x = encode("This is some text");
-const cost_per_token = 1.5 / 1000000;
-console.log(4000 * cost_per_token);
