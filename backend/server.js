@@ -54,6 +54,56 @@ async function runCompletion(prompt) {
   return response;
 }
 
+//runCompletion2
+async function runCompletion2(prompt, function_arguments, weatherObject) {
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    // model: "gpt-4",
+    messages: [
+      { role: "user", content: prompt },
+      {
+        role: "assistant",
+        content: null,
+        function_call: {
+          name: "get_current_weather",
+          arguments: function_arguments,
+        },
+      },
+      {
+        role: "function",
+        name: "get_current_weather",
+        content: JSON.stringify(weatherObject),
+      },
+    ],
+    functions: [
+      {
+        name: "get_current_weather",
+        description: "Get the current weather in a given location",
+        parameters: {
+          type: "object",
+          properties: {
+            location: {
+              type: "string",
+              description: "The city and state, e.g. San Francisco, CA",
+            },
+            unit: {
+              type: "string",
+              enum: ["celsius", "fahrenheit"],
+            },
+          },
+          required: ["location"],
+        },
+      },
+    ],
+    temperature: 1,
+    max_tokens: 50,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+  });
+  return response;
+}
+
 // get weather
 async function getWeather(parsed_function_arguments) {
   try {
@@ -110,16 +160,18 @@ app.post("/api/chatgpt", async (req, res) => {
       // request 2
       // Get weather
       // temperature, unit and description
-      const wetherObject = await getWeather(parsed_function_arguments);
+      const weatherObject = await getWeather(parsed_function_arguments);
 
-      res.json({
-        request1: { data: completion.data },
-        request2: wetherObject,
-      });
-      return;
+      // requesst 3
+      const response = await runCompletion2(
+        text,
+        function_arguments,
+        weatherObject
+      );
+
+      // send response to react application
+      res.json(response.data);
     }
-
-    // requesst 3
   } catch (error) {
     //handle the error in the catch statement
     if (error.response) {

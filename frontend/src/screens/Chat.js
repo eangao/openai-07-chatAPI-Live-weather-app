@@ -37,7 +37,7 @@ function Chat() {
         console.log(data);
 
         setPrompt(inputValue);
-        // setResult(data.data.choices[0].message.content);
+        setResult(data.choices[0].message.content);
         setJresult(JSON.stringify(data, null, 2));
         setInputValue("");
         setError("");
